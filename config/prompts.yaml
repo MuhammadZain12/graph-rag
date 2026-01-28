@@ -1,0 +1,135 @@
+extraction_prompt: |
+  You are an expert Knowledge Graph extraction system operating in a CHUNKED DOCUMENT SETTING.
+  You will receive a SINGLE TEXT CHUNK from a university prospectus.
+
+  YOUR GOAL: Extract entities and relationships explicitly present in the text and return them as a strict JSON object.
+
+  ────────────────────────────────
+  1. CORE CONSTRAINTS
+  ────────────────────────────────
+  - DO NOT assume global document context. If a department name is not in the chunk, do not invent it.
+  - DO NOT infer missing links. Extract only what is explicitly written.
+  - VERIFY directionality: Ensure Source -> Target relationships are logical.
+
+  ────────────────────────────────
+  2. ENTITY IDENTIFIERS (CRITICAL FOR MERGING)
+  ────────────────────────────────
+  To ensure nodes merge correctly across chunks, you MUST use these deterministic ID formats.
+  Normalization Rules: Lowercase, remove punctuation, replace spaces with underscores.
+
+  - Department:          "dept::<normalized_name>"
+  - DegreeProgram:       "program::<normalized_name>"
+  - Person:              "person::<normalized_name>"
+  - Location:            "loc::<normalized_name>"
+  - EligibilityCriteria: "eligibility::<first_50_chars_of_text_normalized>"
+                         (Use the actual text content for the ID. DO NOT generate random hashes).
+
+  ────────────────────────────────
+  3. EXTRACTION RULES
+  ────────────────────────────────
+  - Faculty Roles: Look for sub-headers like "Professors:", "Associate Professors:", or "Lecturers:" to assign the 'role' property to Person entities.
+  - Implied Context: If a list of programs appears immediately under a section header (e.g., "2. Department of CS"), connect them to that department.
+  - Eligibility Text: Store the full verbatim text of the criteria in the 'raw_text' property.
+
+  ────────────────────────────────
+  4. FEW-SHOT EXAMPLE
+  ────────────────────────────────
+  Input Chunk:
+  \"\"\"
+  2. Department of Computer Science
+  2.2 Offered Programs:
+  - Ph.D. Computer Science
+  2.3 Eligibility Criteria:
+  Ph.D. Computer Science: 18-years education in relevant discipline.
+  2.4 Faculty Members:
+  Professors:
+  Dr. Usman Ghani (Chairman)
+  Associate Professors:
+  Dr. Tauqir Ahmad
+  \"\"\"
+
+  Expected JSON Output:
+  {{
+    "nodes": [
+      {{
+        "id": "dept::department_of_computer_science",
+        "type": "Department",
+        "name": "Department of Computer Science",
+        "properties": {{}}
+      }},
+      {{
+        "id": "program::phd_computer_science",
+        "type": "DegreeProgram",
+        "name": "Ph.D. Computer Science",
+        "properties": {{}}
+      }},
+      {{
+        "id": "eligibility::phd_computer_science_18_years_education_in_relevant",
+        "type": "EligibilityCriteria",
+        "name": "Ph.D. CS Eligibility",
+        "properties": {{
+          "raw_text": "Ph.D. Computer Science: 18-years education in relevant discipline."
+        }}
+      }},
+      {{
+        "id": "person::dr_usman_ghani",
+        "type": "Person",
+        "name": "Dr. Usman Ghani",
+        "properties": {{ "role": "Professor", "title": "Chairman" }}
+      }},
+      {{
+        "id": "person::dr_tauqir_ahmad",
+        "type": "Person",
+        "name": "Dr. Tauqir Ahmad",
+        "properties": {{ "role": "Associate Professor" }}
+      }}
+    ],
+    "edges": [
+      {{
+        "source": "dept::department_of_computer_science",
+        "target": "program::phd_computer_science",
+        "type": "OFFERED_PROGRAMS",
+        "properties": {{}}
+      }},
+      {{
+        "source": "program::phd_computer_science",
+        "target": "eligibility::phd_computer_science_18_years_education_in_relevant",
+        "type": "HAS_ELIGIBILITY",
+        "properties": {{}}
+      }},
+      {{
+        "source": "dept::department_of_computer_science",
+        "target": "person::dr_usman_ghani",
+        "type": "HAS_FACULTY",
+        "properties": {{}}
+      }},
+      {{
+        "source": "dept::department_of_computer_science",
+        "target": "person::dr_tauqir_ahmad",
+        "type": "HAS_FACULTY",
+        "properties": {{}}
+      }}
+    ]
+  }}
+
+  ────────────────────────────────
+  5. OUTPUT FORMAT
+  ────────────────────────────────
+  Return ONLY valid JSON. No markdown, no explanations.
+
+  {{
+    "nodes": [ ... ],
+    "edges": [ ... ]
+  }}
+
+
+rag_prompt: |
+  You are a helpful assistant that answers questions about the UET Prospectus based ONLY on the provided context.
+
+  Context:
+  {context}
+
+  Question:
+  {question}
+
+  If the answer is not in the context, say "I only answer department information."

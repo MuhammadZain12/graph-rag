@@ -1,0 +1,27 @@
+services:
+  neo4j:
+    image: neo4j:latest
+    restart: always
+
+    ports:
+      - "127.0.0.1:7687:7687" # Bolt port
+      - "127.0.0.1:7474:7474" # HTTP port (Neo4j Browser) - Highly recommended for debugging
+
+    environment:
+      NEO4J_AUTH: neo4j/${NEO4J_PASSWORD:-password}
+      NEO4J_PLUGINS: '["apoc"]'
+      NEO4J_dbms_security_procedures_unrestricted: "apoc.*"
+      NEO4J_dbms_security_procedures_allowlist: "apoc.*"
+      NEO4J_apoc_export_file_enabled: "true"
+      NEO4J_apoc_import_file_enabled: "true"
+      NEO4J_apoc_import_file_use__neo4j__config: "true"
+
+    volumes:
+      - neo4j_data:/data
+      - neo4j_logs:/logs
+      - neo4j_plugins:/plugins
+
+volumes:
+  neo4j_data:
+  neo4j_logs:
+  neo4j_plugins:

@@ -1,0 +1,82 @@
+[
+  {
+    "category": "Department",
+    "question": "What programs does the Computer Science department offer?"
+  },
+  {
+    "category": "Department",
+    "question": "Who is the head of the Electrical Engineering department?"
+  },
+  {
+    "category": "Department",
+    "question": "What are the admission requirements for Civil Engineering?"
+  },
+  {
+    "category": "Department",
+    "question": "Does the Mechanical Engineering department offer PhD programs?"
+  },
+  {
+    "category": "Department",
+    "question": "List the faculty members in the Software Engineering department."
+  },
+  {
+    "category": "Department",
+    "question": "Where is the Architecture department located?"
+  },
+  {
+    "category": "Department",
+    "question": "What is the contact email for the Mathematics department?"
+  },
+  {
+    "category": "Department",
+    "question": "When was the Chemical Engineering department established?"
+  },
+  {
+    "category": "Department",
+    "question": "Does the Physics department have any research labs?"
+  },
+  {
+    "category": "Department",
+    "question": "What is the duration of the B.Sc program in City and Regional Planning?"
+  },
+  {
+    "category": "Tricky",
+    "question": "Tell me about the department that deals with computers but isn't Computer Science."
+  },
+  {
+    "category": "Tricky",
+    "question": "Which department has the most professors?"
+  },
+  {
+    "category": "Tricky",
+    "question": "Is there a department for Artificial Intelligence?"
+  },
+  {
+    "category": "Tricky",
+    "question": "I want to study robots, which department should I apply to?"
+  },
+  {
+    "category": "Tricky",
+    "question": "Can I do a double major in two different departments?"
+  },
+  {
+    "category": "Out of Scope",
+    "question": "What is the cafeteria menu for today?"
+  },
+  {
+    "category": "Out of Scope",
+    "question": "How do I get a parking permit?"
+  },
+  {
+    "category": "Out of Scope",
+    "question": "What is the weather like in Lahore?"
+  },
+  {
+    "category": "Out of Scope",
+    "question": "Who won the cricket match yesterday?"
+  },
+  {
+    "category": "Out of Scope",
+    "question": "Tell me a joke."
+  }
+]

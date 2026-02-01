@@ -9,7 +9,12 @@ dependencies = [
     "langchain-community>=0.4.1",
     "langchain-google-genai>=4.2.0",
     "langchain-neo4j>=0.8.0",
+    "langchain-openai>=0.1.30",
+    "langchain-huggingface>=0.0.1",
+    "sentence-transformers>=3.0.0",
     "langchain-ollama>=1.0.1",
     "neo4j>=6.1.0",
     "pypdf>=6.6.0",
+    "fastapi>=0.109.0",
+    "uvicorn>=0.27.0",
 ]

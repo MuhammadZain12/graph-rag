@@ -16,15 +16,58 @@ class GraphManager:
             password=settings.env.neo4j_password
         )
 
-    def add_chunk(self, chunk_id: str, text: str):
+    def add_chunk(self, chunk_id: str, text: str, embedding: list = None):
         """
-        Creates a Chunk node with the full text content.
+        Creates a Chunk node with the full text content and optional embedding.
         """
         try:
             cypher = "MERGE (c:Chunk {id: $id}) SET c.text = $text"
-            self.driver.query(cypher, {"id": chunk_id, "text": text})
+            params = {"id": chunk_id, "text": text}
+            
+            if embedding:
+                cypher += ", c.embedding = $embedding"
+                params["embedding"] = embedding
+                
+            self.driver.query(cypher, params)
         except Exception as e:
             print(f"Error adding chunk {chunk_id}: {e}")
+
+    def create_vector_index(self, dimension: int = 384):
+        """
+        Creates a vector index on Chunk nodes if it doesn't exist.
+        """
+        try:
+            # Check if index exists (Neo4j 5.x+)
+            # Note: Syntax varies by version. Using declarative syntax.
+            cypher = f"""
+            CREATE VECTOR INDEX chunk_vector_index IF NOT EXISTS
+            FOR (c:Chunk)
+            ON (c.embedding)
+            OPTIONS {{indexConfig: {{
+                `vector.dimensions`: {dimension},
+                `vector.similarity_function`: 'cosine'
+            }}}}
+            """
+            self.driver.query(cypher)
+            print("Vector index 'chunk_vector_index' ensured.")
+        except Exception as e:
+            print(f"Error creating vector index: {e}")
+
+    def query_vector_index(self, query_embedding: list, top_k: int = 5) -> list:
+        """
+        Queries the vector index for similar chunks.
+        """
+        try:
+            cypher = """
+            CALL db.index.vector.queryNodes('chunk_vector_index', $k, $embedding)
+            YIELD node, score
+            RETURN node.text AS text, node.id AS id, score
+            """
+            result = self.driver.query(cypher, {"k": top_k, "embedding": query_embedding})
+            return result
+        except Exception as e:
+            print(f"Error querying vector index: {e}")
+            return []
 
     def add_graph_data(self, data: dict, chunk_id: str = None):
         """

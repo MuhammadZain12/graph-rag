@@ -24,7 +24,7 @@ class EnvSettings(BaseSettings):
     
     # Gemini
     gemini_api_key: Optional[str] = Field(None, validation_alias="GEMINI_API_KEY")
-    gemini_model: str = Field("gemini-2.5-flash", validation_alias="GEMINI_MODEL")
+    gemini_model: str = Field("gemini-3-flash-preview", validation_alias="GEMINI_MODEL")
     
     # vLLM
     vllm_base_url: str = Field("http://localhost:8000/v1", validation_alias="VLLM_BASE_URL")

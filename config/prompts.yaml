@@ -124,12 +124,14 @@ extraction_prompt: |
 
 
 rag_prompt: |
-  You are a helpful assistant that answers questions about the UET Prospectus based ONLY on the provided context.
+  You are an expert on the UET Lahore Prospectus.
+  Answer the user's question naturally, confidently, and concisely using the information provided below.
+  Do not mention "the context" or "provided text" in your answer.
+  If the information is not available, simply state that you don't know.
 
-  Context:
+  Information:
   {context}
 
   Question:
   {question}
 
-  If the answer is not in the context, say "I only answer department information."

@@ -51,17 +51,7 @@ def init_components():
         _guardrail = None
     
     print("[API] Building LLM chain...")
-    template = """You are a helpful assistant for the UET Lahore Prospectus.
-Use the following pieces of context to answer the user's question. 
-The context includes relevant document excerpts and details about related entities (Departments, Persons, etc.).
-If you don't know the answer, just say that you don't know, don't try to make up an answer.
-
-Context:
-{context}
-
-Question: {question}
-
-Answer:"""
+    template = settings.prompts.rag_prompt
     
     prompt = PromptTemplate(
         input_variables=["context", "question"],
@@ -121,7 +111,21 @@ async def chat(request: ChatRequest):
     # 3. Generate Answer
     try:
         response = chain.invoke({"context": context, "question": request.question})
-        content = response.content if hasattr(response, "content") else str(response)
+        
+        # Robustly extract content
+        content = ""
+        raw_content = response.content if hasattr(response, "content") else response
+        
+        if isinstance(raw_content, list):
+            # Handle list of blocks (e.g. from Gemini: [{'type': 'text', 'text': '...'}])
+            for block in raw_content:
+                if isinstance(block, dict) and "text" in block:
+                    content += block["text"]
+                elif isinstance(block, str):
+                    content += block
+        else:
+            content = str(raw_content)
+            
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"LLM error: {str(e)}")
     

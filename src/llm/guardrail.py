@@ -20,7 +20,7 @@ Determine if the following question is about:
 - Degree programs offered
 - Faculty members
 - Admission requirements or eligibility
-- Campus locations or facilities
+- Campus locations or facilities - Department Related Only
 
 If the question is about ANY of the above topics, it IS ALLOWED.
 If the question is completely unrelated (e.g., weather, politics, other universities), it is NOT ALLOWED.
